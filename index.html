@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espaço Geisch Araújo | Agendamento</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main class="main-container">
+        <!-- Seção da Esquerda: Marca e Imagem -->
+        <section class="branding-section">
+            <h1 class="brand-title">Espaço Geisch Araújo</h1>
+            <p class="brand-subtitle">Realçando sua beleza natural</p>
+            <div class="image-wrapper">
+                <img src="./img/img-principal.jfif" alt="Ilustração Espaço Geisch Araújo" class="hero-image">
+            </div>
+        </section>
+
+        <!-- Seção da Direita: Agenda e Pix -->
+        <section class="card">
+            <h2>✨ Agende seu Horário ✨</h2>
+            
+            <div class="input-group">
+                <input type="text" id="nome" placeholder="Seu nome completo">
+                
+                <select id="servico">
+                    <option value="" disabled selected>Selecione o serviço</option>
+                    <option value="Alisamento">Alisamento</option>
+                    <option value="Cílios fio a fio">Cílios fio a fio</option>
+                    <option value="Colocação de cabelo">Colocação de cabelo</option>
+                    <option value="Escova / Prancha">Escova / Prancha</option>
+                    <option value="Manicure">Manicure</option>
+                    <option value="Manicure / Pedicure">Manicure / Pedicure</option>
+                    <option value="Pedicure">Pedicure</option>
+                    <option value="Progressiva">Progressiva</option>
+                    <option value="Sobrancelha">Sobrancelha</option>
+                    <option value="Sobrancelha / Henna">Sobrancelha / Henna</option>
+                    <option value="Unha de gel">Unha de gel</option>
+                </select>
+
+                <input type="date" id="data" onchange="atualizarHorariosDisponiveis()">
+                
+                <!-- Seletor Dinâmico de Horários -->
+                <select id="hora">
+                    <option value="" disabled selected>Selecione a data primeiro</option>
+                </select>
+
+                <!-- Área Pix -->
+                <div class="pix-card">
+                    <div class="pix-header">
+                        <p>💳 <strong>Taxa de Reserva: R$ 30,00</strong></p>
+                        <small>Garante a sua vaga e é abatido do valor do serviço.</small>
+                    </div>
+
+                    <div class="pix-body">
+                        <div class="qr-container">
+                            <img id="qr-code" src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=34385500835" alt="QR Code Pix">
+                        </div>
+                        <div class="pix-copia">
+                            <label>Chave Pix (CPF):</label>
+                            <div class="copia-box">
+                                <input type="text" id="chave-pix" value="34385500835" readonly>
+                                <button type="button" onclick="copiarPix()">Copiar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="aviso-ressarcimento">⚠️ <em>Caso não compareça na data e horário marcados, o valor do sinal não será ressarcido.</em></p>
+                </div>
+
+                <button onclick="agendar()">Confirmar Agendamento via WhatsApp</button>
+                <button id="btn-verificar" class="btn-secundario" onclick="toggleAgenda()">🔒 Área Administrativa</button>
+            </div>
+
+            <!-- Seção Restrita (Painel de Gerenciamento) -->
+            <div class="agendamento oculto" id="secao-agenda">
+                <h3>🔒 Painel de Controle - Horários Reservados</h3>
+                <ul id="lista-agendamento"></ul>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
