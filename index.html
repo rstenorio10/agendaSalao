@@ -25,29 +25,30 @@
             <div class="input-group">
                 <input type="text" id="nome" placeholder="Seu nome completo">
                 
-                <select id="servico">
+                <!-- Serviços com Duração Oculta em Minutos (data-tempo) -->
+                <select id="servico" onchange="atualizarHorariosDisponiveis()">
                     <option value="" disabled selected>Selecione o serviço</option>
-                    <option value="Alisamento">Alisamento</option>
-                    <option value="Cílios fio a fio">Cílios fio a fio</option>
-                    <option value="Colocação de cabelo">Colocação de cabelo</option>
-                    <option value="Escova / Prancha">Escova / Prancha</option>
-                    <option value="Manicure">Manicure</option>
-                    <option value="Manicure / Pedicure">Manicure / Pedicure</option>
-                    <option value="Pedicure">Pedicure</option>
-                    <option value="Progressiva">Progressiva</option>
-                    <option value="Sobrancelha">Sobrancelha</option>
-                    <option value="Sobrancelha / Henna">Sobrancelha / Henna</option>
-                    <option value="Unha de gel">Unha de gel</option>
+                    <option value="Alisamento" data-tempo="90">Alisamento</option>
+                    <option value="Cílios fio a fio" data-tempo="60">Cílios fio a fio</option>
+                    <option value="Colocação de cabelo" data-tempo="120">Colocação de cabelo</option>
+                    <option value="Escova / Prancha" data-tempo="60">Escova / Prancha</option>
+                    <option value="Manicure" data-tempo="40">Manicure</option>
+                    <option value="Manicure / Pedicure" data-tempo="90">Manicure / Pedicure</option>
+                    <option value="Pedicure" data-tempo="40">Pedicure</option>
+                    <option value="Progressiva" data-tempo="60">Progressiva</option>
+                    <option value="Sobrancelha" data-tempo="20">Sobrancelha</option>
+                    <option value="Sobrancelha / Henna" data-tempo="20">Sobrancelha / Henna</option>
+                    <option value="Unha de gel" data-tempo="120">Unha de gel</option>
                 </select>
 
                 <input type="date" id="data" onchange="atualizarHorariosDisponiveis()">
                 
                 <!-- Seletor Dinâmico de Horários -->
                 <select id="hora">
-                    <option value="" disabled selected>Selecione a data primeiro</option>
+                    <option value="" disabled selected>Selecione o serviço e a data primeiro</option>
                 </select>
 
-                <!-- Área Pix -->
+                <!-- Área Pix (Apenas Chave + Copiar) -->
                 <div class="pix-card">
                     <div class="pix-header">
                         <p>💳 <strong>Taxa de Reserva: R$ 30,00</strong></p>
@@ -55,9 +56,6 @@
                     </div>
 
                     <div class="pix-body">
-                        <div class="qr-container">
-                            <img id="qr-code" src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=34385500835" alt="QR Code Pix">
-                        </div>
                         <div class="pix-copia">
                             <label>Chave Pix (CPF):</label>
                             <div class="copia-box">
