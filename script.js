@@ -3,9 +3,10 @@ let agendamentos = JSON.parse(localStorage.getItem("agendamentos")) || [];
 // Senha administrativa configurada
 const SENHA_MESTRE = "Maria@!1990Rd";
 
-const INICIO_EXPEDIENTE = 8 * 60;
-const FIM_EXPEDIENTE = 18 * 60;
-const INTERVALO_OPCOES = 30;
+// Horário de Funcionamento: Terça a Sábado (Primeiro horário às 09:00 e último às 20:00)
+const INICIO_EXPEDIENTE = 9 * 60;   // 09:00 (540 minutos)
+const FIM_EXPEDIENTE = 20 * 60;      // 20:00 (1200 minutos) - Último horário permitido para início
+const INTERVALO_OPCOES = 20;        // Intervalo de busca (20 em 20 min)
 
 document.addEventListener("DOMContentLoaded", () => {
     atualizarListaUI();
@@ -37,14 +38,32 @@ function minutosParaHora(minutosTotais) {
     return `${h}:${m}`;
 }
 
+// Atualiza os horários disponíveis considerando o expediente e os dias de funcionamento
 function atualizarHorariosDisponiveis() {
-    const dataSelecionada = document.getElementById("data").value;
+    const selectServico = document.getElementById("servico");
+    const campoData = document.getElementById("data");
+    const dataSelecionada = campoData.value;
     const selectHora = document.getElementById("hora");
 
     selectHora.innerHTML = "";
 
-    if (!dataSelecionada) {
-        selectHora.innerHTML = `<option value="" disabled selected>Selecione a data primeiro</option>`;
+    const opcaoServico = selectServico.options[selectServico.selectedIndex];
+    const duracaoNovoServico = opcaoServico ? parseInt(opcaoServico.getAttribute("data-tempo")) : 0;
+
+    if (!selectServico.value || !dataSelecionada) {
+        selectHora.innerHTML = `<option value="" disabled selected>Selecione o serviço e a data primeiro</option>`;
+        return;
+    }
+
+    // Validação de Dias Úteis (Terça a Sábado)
+    const [ano, mes, dia] = dataSelecionada.split("-").map(Number);
+    const dataObjeto = new Date(ano, mes - 1, dia);
+    const diaDaSemana = dataObjeto.getDay();
+
+    if (diaDaSemana === 0 || diaDaSemana === 1) { // 0 = Domingo, 1 = Segunda
+        alert("Nosso atendimento é de terça a sábado, das 09:00 às 20:00.");
+        campoData.value = "";
+        selectHora.innerHTML = `<option value="" disabled selected>Selecione uma data válida (Terça a Sábado)</option>`;
         return;
     }
 
@@ -57,13 +76,15 @@ function atualizarHorariosDisponiveis() {
 
     const agendamentosDoDia = agendamentos.filter(item => item.data === dataSelecionada);
 
-    for (let min = INICIO_EXPEDIENTE; min <= FIM_EXPEDIENTE - 60; min += INTERVALO_OPCOES) {
+    // O laço vai até FIM_EXPEDIENTE (20:00), permitindo que 20:00 seja o último horário de início selecionável
+    for (let min = INICIO_EXPEDIENTE; min <= FIM_EXPEDIENTE; min += INTERVALO_OPCOES) {
         const inicioNovo = min;
-        const fimNovo = min + 60;
+        const fimNovo = min + duracaoNovoServico;
 
+        // Verifica se há conflito com algum atendimento existente
         const conflito = agendamentosDoDia.some(item => {
             const agendadoInicio = horaParaMinutos(item.hora);
-            const agendadoFim = agendadoInicio + 60;
+            const agendadoFim = agendadoInicio + (item.duracao || 60);
             return inicioNovo < agendadoFim && fimNovo > agendadoInicio;
         });
 
@@ -92,19 +113,16 @@ function atualizarHorariosDisponiveis() {
     }
 }
 
-// Controle de Acesso Restrito via Senha
 function toggleAgenda() {
     const secaoAgenda = document.getElementById("secao-agenda");
     const btnVerificar = document.getElementById("btn-verificar");
 
-    // Se já estiver visível, apenas oculta ao clicar novamente
     if (!secaoAgenda.classList.contains("oculto")) {
         secaoAgenda.classList.add("oculto");
         btnVerificar.textContent = "🔒 Área Administrativa";
         return;
     }
 
-    // Solicita a senha ao usuário
     const senhaDigitada = prompt("Digite a senha de administrador para acessar:");
 
     if (senhaDigitada === SENHA_MESTRE) {
@@ -117,7 +135,8 @@ function toggleAgenda() {
 
 function agendar() {
     const nome = document.getElementById("nome").value.trim();
-    const servico = document.getElementById("servico").value;
+    const selectServico = document.getElementById("servico");
+    const servico = selectServico.value;
     const data = document.getElementById("data").value;
     const hora = document.getElementById("hora").value;
 
@@ -126,7 +145,10 @@ function agendar() {
         return;
     }
 
-    const novoAgendamento = { nome, servico, data, hora };
+    const opcaoSelecionada = selectServico.options[selectServico.selectedIndex];
+    const duracao = parseInt(opcaoSelecionada.getAttribute("data-tempo"));
+
+    const novoAgendamento = { nome, servico, data, hora, duracao };
     agendamentos.push(novoAgendamento);
 
     localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
@@ -188,7 +210,7 @@ function atualizarListaUI() {
         li.innerHTML = `
             <div class="info-cliente">
                 <strong>${item.nome}</strong>
-                <span>✨ ${item.servico}</span>
+                <span>✨ ${item.servico} (${item.duracao || 60} min)</span>
                 <small>📅 ${dataFormatada} às ⏰ ${item.hora}</small>
             </div>
             <button class="btn-cancelar" onclick="cancelarAgendamento(${index})">Cancelar</button>
